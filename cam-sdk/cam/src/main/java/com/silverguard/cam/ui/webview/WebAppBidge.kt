@@ -4,6 +4,7 @@ import android.content.Context
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.Toast
+import org.json.JSONObject
 
 class WebAppBridge(
     private val context: Context,
@@ -30,18 +31,12 @@ class WebAppBridge(
     }
 
     fun sendActionToWeb(webView: WebView, command: String, payload: Map<String, String>? = null) {
-        val payloadJson = payload?.entries
-            ?.joinToString(",") { "\"${it.key}\":\"${it.value}\"" }
-            ?: ""
+        val json = JSONObject().apply {
+            put("command", command)
+            put("payload", JSONObject(payload ?: emptyMap<String, String>()))
+        }
 
-        val jsPayload = if (payloadJson.isNotEmpty()) "{ $payloadJson }" else "{}"
-
-        val js = """
-        window.nativeBridge?.onMessage({
-            command: "$command",
-            payload: $jsPayload
-        });
-    """.trimIndent()
+        val js = "window.onAndroidMessage($json);"
 
         webView.post {
             webView.evaluateJavascript(js, null)
