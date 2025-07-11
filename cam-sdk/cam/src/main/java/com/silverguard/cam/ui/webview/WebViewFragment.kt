@@ -2,6 +2,7 @@ package com.silverguard.cam.ui.webview
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebViewClient
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.silverguard.cam.databinding.FragmentWebViewBinding
 
@@ -19,11 +21,12 @@ class WebViewFragment : Fragment() {
     private var _binding: FragmentWebViewBinding? = null
     private val binding get() = _binding!!
     private lateinit var bridge: WebAppBridge
+    private var pendingPermissionRequest: PermissionRequest? = null
 
     private val requestMicrophonePermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        bridge.sendActionToWeb(binding.webView, "microphonePermission", mapOf("status" to (if (isGranted) "authorized" else "denied")))
+        handlePermissionResult(isGranted)
     }
 
     override fun onCreateView(
@@ -54,7 +57,17 @@ class WebViewFragment : Fragment() {
             webViewClient = WebViewClient()
             webChromeClient = object : WebChromeClient() {
                 override fun onPermissionRequest(request: PermissionRequest) {
-                    request.grant(request.resources)
+                    if (request.resources.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
+                        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
+                            == PackageManager.PERMISSION_GRANTED) {
+                            request.grant(request.resources)
+                        } else {
+                            pendingPermissionRequest = request
+                            requestMicrophonePermission.launch(Manifest.permission.RECORD_AUDIO)
+                        }
+                    } else {
+                        request.deny()
+                    }
                 }
             }
 
@@ -66,6 +79,25 @@ class WebViewFragment : Fragment() {
 
             loadUrl(url)
         }
+    }
+
+    private fun handlePermissionResult(isGranted: Boolean) {
+        val request = pendingPermissionRequest
+        if (request != null) {
+            if (isGranted) {
+                request.grant(request.resources)
+            } else {
+                request.deny()
+            }
+            pendingPermissionRequest = null
+        }
+
+        // Notifica a WebView sobre o resultado da permissão
+        bridge.sendActionToWeb(
+            binding.webView,
+            "microphonePermission",
+            mapOf("status" to if (isGranted) "authorized" else "denied")
+        )
     }
 
     override fun onDestroyView() {
