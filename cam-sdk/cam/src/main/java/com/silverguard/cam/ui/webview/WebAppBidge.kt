@@ -9,18 +9,23 @@ import org.json.JSONObject
 class WebAppBridge(
     private val context: Context,
     private val webView: WebView,
-    private val onRequestMicrophonePermission: () -> Unit
+    private val requestAudioPermissions: () -> Unit,
+    private val requestLibraryPermission: () -> Unit
 ) {
     @JavascriptInterface
     fun postMessage(message: String) {
         try {
-            val json = org.json.JSONObject(message)
+            val json = JSONObject(message)
             val command = json.getString("command")
 
             when (command) {
                 "requestMicrophonePermission" -> {
-                    onRequestMicrophonePermission()
+                    requestAudioPermissions()
                 }
+                "askForLibrary" -> {
+                    requestLibraryPermission()
+                }
+                "back" -> { }
                 else -> {
                     Toast.makeText(context, "Comando desconhecido: $command", Toast.LENGTH_SHORT).show()
                 }
@@ -30,14 +35,10 @@ class WebAppBridge(
         }
     }
 
-    fun sendActionToWeb(webView: WebView, command: String, payload: Map<String, String>? = null) {
-        val json = JSONObject().apply {
-            put("command", command)
-            put("payload", JSONObject(payload ?: emptyMap<String, String>()))
-        }
-
-        val js = "window.onAndroidMessage($json);"
-
+    fun sendActionToWeb(command: String, payload: Map<String, String>? = null) {
+        val js = """
+            window.nativeBridge.onMessage(${JSONObject(mapOf("command" to command, "payload" to payload))});
+        """.trimIndent()
         webView.post {
             webView.evaluateJavascript(js, null)
         }

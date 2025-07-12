@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "79589500806",
+    "project_id": "cam-ios-sdk",
+    "storage_bucket": "cam-ios-sdk.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79589500806:android:a4065496abfd6bf53bae07",
+        "android_client_info": {
+          "package_name": "com.silverguard.sample"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClGBmNTHrGOvk_LvIEMbNkiU6BZHPA7CQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

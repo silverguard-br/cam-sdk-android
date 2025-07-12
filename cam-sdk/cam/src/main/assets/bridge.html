@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>WebView Command Center</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    :root {
+      --primary: #007aff;
+      --background: #f9f9f9;
+      --text: #111;
+      --muted: #666;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--background);
+      color: var(--text);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card {
+      background-color: #fff;
+      padding: 24px;
+      border-radius: var(--radius);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    .group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    button {
+      padding: 14px 20px;
+      font-size: 16px;
+      background-color: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background-color 0.2s;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #005fcb;
+    }
+
+    .status {
+      font-size: 14px;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>Native Bridge</h1>
+
+  <div class="group">
+    <button onclick="sendCommand('requestMicrophonePermission')">Solicitar Microfone</button>
+    <div class="status" id="microphoneStatus">Status: --</div>
+  </div>
+
+  <div class="group">
+    <button onclick="sendCommand('askForLibrary')">Solicitar Biblioteca</button>
+    <div class="status" id="libraryStatus">Status: --</div>
+  </div>
+
+  <div class="group">
+    <button onclick="sendCommand('back')">Voltar</button>
+  </div>
+
+  <div class="group">
+    <button id="recordButton" onclick="startRecording()" style="display: none;">🎙️ Gravar Áudio</button>
+    <button id="stopButton" onclick="stopRecording()" style="display: none;">⏹️ Parar</button>
+    <audio id="player" controls style="display: none;"></audio>
+  </div>
+
+  <div class="group" id="filePickerWrapper" style="display: none;">
+    <button onclick="document.getElementById('filePicker').click()">📷 Escolher Imagem</button>
+    <input type="file" id="filePicker" accept="image/*" style="display: none;" />
+  </div>
+  
+  <img id="preview" alt="Imagem selecionada" style="display: none; max-width: 100%; margin-top: 10px;" />
+</div>
+
+<script>
+  let mediaRecorder;
+  let audioChunks = [];
+
+  function sendCommand(command, payload = null) {
+    try {
+      const message = JSON.stringify({ command, payload });
+      if (window.NativeInterface && typeof window.NativeInterface.postMessage === 'function') {
+        window.NativeInterface.postMessage(message);
+      } else {
+        console.warn("NativeInterface.postMessage not available");
+      }
+    } catch (e) {
+      console.error("Bridge failed", e);
+    }
+  }
+
+  function updateStatus(answerCommand, status) {
+    if (answerCommand === "microphonePermission") {
+      document.getElementById("microphoneStatus").textContent = "Status: " + status;
+
+      const recordButton = document.getElementById("recordButton");
+      if (status === "authorized") {
+        recordButton.style.display = "block";
+        recordButton.disabled = false;
+      } else {
+        recordButton.style.display = "none";
+      }
+
+    } else if (answerCommand === "libraryPermission") {
+      document.getElementById("libraryStatus").textContent = "Status: " + status;
+
+      const filePickerWrapper = document.getElementById("filePickerWrapper");
+      if (status === "authorized") {
+        filePickerWrapper.style.display = "flex";
+      } else {
+        filePickerWrapper.style.display = "none";
+      }
+
+    } else {
+      console.warn("Resposta inesperada:", answerCommand, status);
+    }
+  }
+
+  window.nativeBridge = {
+    onMessage: function (jsonMessage) {
+      try {
+        const message = typeof jsonMessage === 'string' ? JSON.parse(jsonMessage) : jsonMessage;
+        const { command, payload } = message;
+        updateStatus(command, payload?.status ?? "Sem status");
+      } catch (e) {
+        console.error("Erro ao processar mensagem:", e);
+      }
+    }
+  };
+
+  function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = event => {
+          if (event.data.size > 0) {
+            audioChunks.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audio = document.getElementById('player');
+          audio.src = audioUrl;
+          audio.style.display = "block";
+        };
+
+        mediaRecorder.start();
+        document.getElementById('recordButton').style.display = "none";
+        document.getElementById('stopButton').style.display = "block";
+      })
+      .catch(err => {
+        alert("Erro ao acessar microfone: " + err.message);
+      });
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+      document.getElementById('recordButton').style.display = "block";
+      document.getElementById('stopButton').style.display = "none";
+    }
+  }
+
+  document.getElementById("filePicker").addEventListener("change", function (event) {
+  const file = event.target.files[0];
+  if (file && file.type.startsWith("image/")) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = document.getElementById("preview");
+      img.src = e.target.result;
+      img.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  } else {
+    alert("Por favor, selecione uma imagem válida.");
+  }
+});
+</script>
+</body>
+</html>
