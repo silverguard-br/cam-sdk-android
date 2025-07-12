@@ -31,6 +31,14 @@ class WebViewFragment : Fragment() {
     ) { permissions ->
         val micGranted = permissions[Manifest.permission.RECORD_AUDIO] == true
         val modifyGranted = permissions[Manifest.permission.MODIFY_AUDIO_SETTINGS] == true
+
+        val micDeniedPermanently = !micGranted && !shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)
+        val modifyDeniedPermanently = !modifyGranted && !shouldShowRequestPermissionRationale(Manifest.permission.MODIFY_AUDIO_SETTINGS)
+
+        if (micDeniedPermanently || modifyDeniedPermanently) {
+            openAppSettings()
+        }
+
         val granted = micGranted && modifyGranted
         bridge.sendActionToWeb("microphonePermission", mapOf("status" to if (granted) "authorized" else "denied"))
     }
@@ -38,6 +46,10 @@ class WebViewFragment : Fragment() {
     private val requestLibraryPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
+        if (!isGranted && !shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            openAppSettings()
+        }
+
         bridge.sendActionToWeb("libraryPermission", mapOf("status" to if (isGranted) "authorized" else "denied"))
     }
 
@@ -139,6 +151,9 @@ class WebViewFragment : Fragment() {
                     } else {
                         bridge.sendActionToWeb("libraryPermission", mapOf("status" to "authorized"))
                     }
+                },
+                onBackCommand = {
+                    requireActivity().finish()
                 }
             )
 
@@ -151,5 +166,12 @@ class WebViewFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun openAppSettings() {
+        val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = android.net.Uri.fromParts("package", requireContext().packageName, null)
+        }
+        startActivity(intent)
     }
 }
