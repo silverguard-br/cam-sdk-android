@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import com.silverguard.cam.CamMainActivity
 import com.silverguard.cam.core.model.RequestUrlModel
+import com.silverguard.cam.core.styles.ColorsInterface
+import com.silverguard.cam.core.styles.FontsInterface
+import com.silverguard.cam.core.styles.Stylesheet
 import com.silverguard.cam.init.SilverguardKoinInitializer
 
 object SilverguardCAM {
@@ -17,6 +20,14 @@ object SilverguardCAM {
             this.apiKey = apiKey
             this.isInitialized = true
         }
+    }
+
+    fun setColors(colors: ColorsInterface) {
+        Stylesheet.setColors(colors)
+    }
+
+    fun setFonts(fonts: FontsInterface) {
+        Stylesheet.setFonts(fonts)
     }
 
     fun getApiKey(): String {

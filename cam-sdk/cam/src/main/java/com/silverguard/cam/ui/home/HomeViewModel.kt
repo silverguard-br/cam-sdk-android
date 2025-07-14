@@ -23,7 +23,7 @@ class HomeViewModel : ViewModel() {
 
     private fun loadData() {
         viewModelScope.launch {
-            val response = com.silverguard.cam.core.network.RetrofitClient.api.postMedRequest(SilverguardCAM.getRequestUrlModel())
+            val response = RetrofitClient.api.postMedRequest(SilverguardCAM.getRequestUrlModel())
             if (response.isSuccessful) {
                 val url = response.body()?.data?.url
                 if (!url.isNullOrEmpty())
