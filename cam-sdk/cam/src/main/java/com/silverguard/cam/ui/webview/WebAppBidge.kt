@@ -23,7 +23,7 @@ class WebAppBridge(
                 "requestMicrophonePermission" -> {
                     requestAudioPermissions()
                 }
-                "askForLibrary" -> {
+                "requestLibraryPermission" -> {
                     requestLibraryPermission()
                 }
                 "back" -> {
@@ -40,7 +40,7 @@ class WebAppBridge(
 
     fun sendActionToWeb(command: String, payload: Map<String, String>? = null) {
         val js = """
-            window.nativeBridge.onMessage(${JSONObject(mapOf("command" to command, "payload" to payload))});
+            window.onAndroidMessage(${JSONObject(mapOf("command" to command, "payload" to payload))});
         """.trimIndent()
         webView.post {
             webView.evaluateJavascript(js, null)

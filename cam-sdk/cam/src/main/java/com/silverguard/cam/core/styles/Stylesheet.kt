@@ -6,14 +6,14 @@ interface Styling {
 }
 
 object Stylesheet {
-    var colors: ColorsInterface = DefaultColors()
-    var fonts: FontsInterface? = null
+    /*var colors: ColorsInterface = DefaultColors()
+    var fonts: FontsInterface? = null*/
 
     fun setColors(colors: ColorsInterface) {
-        this.colors = colors
+        //this.colors = colors
     }
 
     fun setFonts(fonts: FontsInterface) {
-        this.fonts = fonts
+        //this.fonts = fonts
     }
 }

@@ -157,9 +157,10 @@ class WebViewFragment : Fragment() {
                 }
             )
 
-            addJavascriptInterface(bridge, "NativeInterface")
+            addJavascriptInterface(bridge, "AndroidBridge")
 
-            loadUrl("file:///android_asset/bridge.html")
+            loadUrl(url)
+            //loadUrl("file:///android_asset/bridge.html")
         }
     }
 
