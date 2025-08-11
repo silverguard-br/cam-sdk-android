@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.androidx.navigation.safe.args)
+    id("maven-publish")
 }
 
 android {
@@ -35,6 +36,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
@@ -55,4 +63,28 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.koin.core)
     implementation(libs.koin.android)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            groupId = "com.github.silverguard-br"
+            artifactId = "cam"
+            version = "1.0.0"
+
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/silverguard-br/cam-sdk-android")
+            credentials {
+                username = "[USERNAME]"
+                password = "[TOKEN]"
+            }
+        }
+    }
 }

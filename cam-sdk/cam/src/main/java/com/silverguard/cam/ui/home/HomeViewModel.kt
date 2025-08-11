@@ -2,6 +2,7 @@ package com.silverguard.cam.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.silverguard.cam.core.config.FLOW
 import com.silverguard.cam.core.config.SilverguardCAM
 import com.silverguard.cam.core.network.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,14 +17,31 @@ class HomeViewModel : ViewModel() {
 
     fun onAction(action: HomeUiAction) {
         when (action) {
-            is HomeUiAction.Load -> loadData()
-            is HomeUiAction.Retry -> loadData()
+            is HomeUiAction.Load, HomeUiAction.Retry -> {
+                if (SilverguardCAM.getFlow() == FLOW.CREATE_REQUEST) loadData()
+                else if (SilverguardCAM.getFlow() == FLOW.GET_REQUESTS) loadListUrlData()
+            }
         }
     }
 
     private fun loadData() {
         viewModelScope.launch {
             val response = RetrofitClient.api.postMedRequest(SilverguardCAM.getRequestUrlModel())
+            if (response.isSuccessful) {
+                val url = response.body()?.data?.url
+                if (!url.isNullOrEmpty())
+                    _uiState.value = HomeUiState.Success(url)
+                else
+                    _uiState.value = HomeUiState.Error
+            } else {
+                _uiState.value = HomeUiState.Error
+            }
+        }
+    }
+
+    private fun loadListUrlData() {
+        viewModelScope.launch {
+            val response = RetrofitClient.api.listUrl(SilverguardCAM.getRequestListUrlModel())
             if (response.isSuccessful) {
                 val url = response.body()?.data?.url
                 if (!url.isNullOrEmpty())

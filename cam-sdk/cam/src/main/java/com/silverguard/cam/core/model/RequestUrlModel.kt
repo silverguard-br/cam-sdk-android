@@ -1,26 +1,20 @@
 package com.silverguard.cam.core.model
 
 data class RequestUrlModel(
-    val transaction: Transaction,
-    val destination_bank: Bank,
-    val origin_bank_customer: BankCustomer,
-    val destination_bank_customer: BankCustomer
-)
-
-data class Transaction(
-    val e2e: String,
-    val amount: Int,
-    val date: String
-)
-
-data class Bank(
-    val name: String,
-    val ispb: String,
-    val compe: String
-)
-
-data class BankCustomer(
-    val name: String,
-    val document: String,
-    val document_type: String
+    val transaction_id: String,
+    val transaction_amount: Double? = null,
+    val transaction_time: String? = null,
+    val transaction_description: String? = null,
+    val reporter_client_name: String? = null,
+    val reporter_client_id: Long? = null,
+    val contested_participant_id: String? = null,
+    val counterparty_client_name: String? = null,
+    val counterparty_client_id: Long? = null,
+    val counterparty_client_key: String? = null,
+    val protocol_id: String? = null,
+    val pix_auto: Boolean? = null,
+    val client_id: String? = null,
+    val client_since: String? = null,
+    val client_birth: String? = null,
+    val autofraud_risk: Boolean? = null,
 )

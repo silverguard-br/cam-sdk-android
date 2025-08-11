@@ -3,6 +3,7 @@ package com.silverguard.cam.core.config
 import android.content.Context
 import android.content.Intent
 import com.silverguard.cam.CamMainActivity
+import com.silverguard.cam.core.model.RequestListUrlModel
 import com.silverguard.cam.core.model.RequestUrlModel
 import com.silverguard.cam.core.styles.ColorsInterface
 import com.silverguard.cam.core.styles.FontsInterface
@@ -13,7 +14,9 @@ object SilverguardCAM {
 
     private var apiKey: String? = null
     private var isInitialized = false
-    private var model: RequestUrlModel? = null
+    private var requestUrlModel: RequestUrlModel? = null
+    private var requestListUrlModel: RequestListUrlModel? = null
+    private var flow: FLOW = FLOW.CREATE_REQUEST
 
     fun configure(context: Context, apiKey: String) {
         if (!isInitialized) {
@@ -30,6 +33,8 @@ object SilverguardCAM {
         Stylesheet.setFonts(fonts)
     }
 
+    fun getFlow() = this.flow
+
     fun getApiKey(): String {
         check(isInitialized) { "SilverguardCAM is not configured. Call configure(context, apiKey) first." }
         return apiKey!!
@@ -37,13 +42,32 @@ object SilverguardCAM {
 
     fun getRequestUrlModel(): RequestUrlModel {
         check(isInitialized) { "SilverguardCAM is not configured. Call configure(context, apiKey) first." }
-        return model ?: throw IllegalStateException("RequestUrlModel is not set. Call launch(context, model) first.")
+        return requestUrlModel ?: throw IllegalStateException("RequestUrlModel is not set. Call launch(context, model) first.")
     }
 
-    fun launch(context: Context, model: RequestUrlModel) {
+    fun getRequestListUrlModel(): RequestListUrlModel {
+        check(isInitialized) { "SilverguardCAM is not configured. Call configure(context, apiKey) first." }
+        return requestListUrlModel ?: throw IllegalStateException("RequestUrlModel is not set. Call launch(context, model) first.")
+    }
+
+    fun createRequest(context: Context, model: RequestUrlModel) {
         SilverguardKoinInitializer.init(context)
-        this.model = model
+        this.requestUrlModel = model
+        this.flow = FLOW.CREATE_REQUEST
         val intent = Intent(context, CamMainActivity::class.java)
         context.startActivity(intent)
     }
+
+    fun getRequests(context: Context, model: RequestListUrlModel) {
+        SilverguardKoinInitializer.init(context)
+        this.requestListUrlModel = model
+        this.flow = FLOW.GET_REQUESTS
+        val intent = Intent(context, CamMainActivity::class.java)
+        context.startActivity(intent)
+    }
+}
+
+enum class FLOW {
+    CREATE_REQUEST,
+    GET_REQUESTS
 }

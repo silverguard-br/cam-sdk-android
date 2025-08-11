@@ -3,6 +3,7 @@ package com.silverguard.cam.ui.webview
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context // <-- ADICIONE
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -18,6 +19,7 @@ import android.webkit.WebViewClient
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.silverguard.cam.core.navigator.CAMSdkNavigator
 import com.silverguard.cam.databinding.FragmentWebViewBinding
 
 class WebViewFragment : Fragment() {
@@ -25,6 +27,16 @@ class WebViewFragment : Fragment() {
     private var _binding: FragmentWebViewBinding? = null
     private val binding get() = _binding!!
     private lateinit var bridge: WebAppBridge
+    private var navigator: CAMSdkNavigator? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        navigator = when {
+            parentFragment is CAMSdkNavigator -> parentFragment as CAMSdkNavigator
+            context is CAMSdkNavigator -> context as CAMSdkNavigator
+            else -> null
+        }
+    }
 
     private val requestAudioPermissions = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -125,7 +137,7 @@ class WebViewFragment : Fragment() {
                     filePathCallback: ValueCallback<Array<Uri>>,
                     fileChooserParams: FileChooserParams
                 ): Boolean {
-                    fileCallback?.onReceiveValue(null) // clear previous
+                    fileCallback?.onReceiveValue(null)
 
                     fileCallback = filePathCallback
                     val intent = fileChooserParams.createIntent()
@@ -152,15 +164,16 @@ class WebViewFragment : Fragment() {
                         bridge.sendActionToWeb("libraryPermission", mapOf("status" to "authorized"))
                     }
                 },
-                onBackCommand = {
-                    requireActivity().finish()
+                onBackCommand = { origin ->
+                    requireActivity().runOnUiThread {
+                        navigator?.onBackFromCAMSdk(origin)
+                        requireActivity().finish()
+                    }
                 }
             )
 
             addJavascriptInterface(bridge, "AndroidBridge")
-
             loadUrl(url)
-            //loadUrl("file:///android_asset/bridge.html")
         }
     }
 

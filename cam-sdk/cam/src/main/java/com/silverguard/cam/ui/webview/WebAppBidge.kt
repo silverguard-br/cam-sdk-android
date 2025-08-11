@@ -11,7 +11,7 @@ class WebAppBridge(
     private val webView: WebView,
     private val requestAudioPermissions: () -> Unit,
     private val requestLibraryPermission: () -> Unit,
-    private val onBackCommand: () -> Unit
+    private val onBackCommand: (String?) -> Unit
 ) {
     @JavascriptInterface
     fun postMessage(message: String) {
@@ -27,7 +27,8 @@ class WebAppBridge(
                     requestLibraryPermission()
                 }
                 "back" -> {
-                    onBackCommand()
+                    val origin = json.optString("origin", "")
+                    onBackCommand(origin)
                 }
                 else -> {
                     Toast.makeText(context, "Comando desconhecido: $command", Toast.LENGTH_SHORT).show()
