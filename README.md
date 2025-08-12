@@ -89,6 +89,87 @@ dependencies {
     android:maxSdkVersion="32" />
 ```
 
+## 🔌 Integração JavaScript ↔ WebView (Android)
+
+Este documento explica **todas as interações JS** implementadas nos trechos abaixo:
+
+- `WebAppBridge` — ponte JS exposta para o conteúdo web
+- `WebViewFragment` — configuração da WebView, permissões e file chooser
+
+---
+
+### 📐 Arquitetura de Mensagens
+
+Canais
+
+- **Web → Android**: `AndroidBridge.postMessage(stringJson)`
+- **Android → Web**: `window.onAndroidMessage({ command, payload })` (disparado via `bridge.sendActionToWeb(...)`)
+
+Formato (contrato)
+
+**Web → Android**
+
+```json
+{
+  "command": "requestMicrophonePermission | requestLibraryPermission | back | ...",
+  "origin": "opcional-identifica-origem",
+  "payload": { "chave": "valor (opcional)" }
+}
+```
+
+### 🧩 Implementação WebView JS no Android (resumo do código)
+
+Ponte JS — WebAppBridge
+- Recebe JSON com command
+- Despacha para permissões, back, ou erro
+- Envia respostas para window.onAndroidMessage(...)
+```kotlin
+@JavascriptInterface
+fun postMessage(message: String) {
+    val json = JSONObject(message)
+    val command = json.getString("command")
+    when (command) {
+        "requestMicrophonePermission" -> requestAudioPermissions()
+        "requestLibraryPermission" -> requestLibraryPermission()
+        "back" -> onBackCommand(json.optString("origin", ""))
+        else -> Toast.makeText(context, "Comando desconhecido: $command", Toast.LENGTH_SHORT).show()
+    }
+}
+
+fun sendActionToWeb(command: String, payload: Map<String, String>?) {
+    val js = """
+        window.onAndroidMessage(${JSONObject(mapOf("command" to command, "payload" to payload))});
+    """.trimIndent()
+    webView.post { webView.evaluateJavascript(js, null) }
+}
+```
+
+Registro da ponte na WebView — WebViewFragment
+- Habilita JS/DOM Storage
+- Configura WebChromeClient para:
+- Permissões de áudio via onPermissionRequest
+- Upload de arquivos via onShowFileChooser
+- Registra a ponte: addJavascriptInterface(bridge, "AndroidBridge")
+- Chama loadUrl(url)
+
+Pontos-chave:
+- Permissão de microfone:
+    * Verifica RECORD_AUDIO e MODIFY_AUDIO_SETTINGS
+    * Se concedidas → request.grant(...)
+    * Se não → dispara requestAudioPermissions.launch(...)
+    * Após decisão → envia microphonePermission para a Web com status
+- Permissão de biblioteca/arquivos:
+    * API ≤ 32: solicita READ_EXTERNAL_STORAGE (se negada permanente, abre Configurações)
+    * API ≥ 33: considera authorized (seletor do sistema)
+    * Emite libraryPermission com status
+- File input (<input type="file">):
+    * Interceptado por onShowFileChooser
+    * Lança o seletor via fileChooserLauncher
+    * Retorna URI(s) a fileCallback (fluxo do WebView/HTML continua normalmente)
+- Back nativo com origem:
+    * Ao receber "back", chama navigator?.onBackFromCAMSdk(origin)
+    * Finaliza a Activity do fluxo (requireActivity().finish())
+
 ## 🚀 Uso
 
 ### 1) Configuração (Application ou Activity inicial)
