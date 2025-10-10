@@ -5,9 +5,9 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 
-class SilverguardInitProvider : ContentProvider() {
+class SilverguardCamInitProvider : ContentProvider() {
     override fun onCreate(): Boolean {
-        context?.let { SilverguardKoinInitializer.init(it) }
+        context?.let { SilverguardCamKoinInitializer.init(it) }
         return true
     }
 

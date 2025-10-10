@@ -1,24 +1,35 @@
 package com.silverguard.sample
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 import com.silverguard.cam.core.config.SilverguardCAM
-import com.silverguard.cam.core.model.RequestListUrlModel
-import com.silverguard.cam.core.model.RequestUrlModel
+import com.silverguard.cam.core.model.CAMRequestListUrlModel
+import com.silverguard.cam.core.model.CAMRequestUrlModel
 import com.silverguard.cam.core.navigator.CAMSdkNavigator
+import com.silverguard.cam.core.styles.CAMDefaultColors
+import com.silverguard.cam.core.styles.CAMColorsInterface
+import com.silverguard.cam.core.styles.CAMDefaultFonts
+import com.silverguard.cam.core.styles.CAMFontStyles
+import com.silverguard.cam.core.styles.CAMFontsInterface
 
 class MainActivity : AppCompatActivity(), CAMSdkNavigator {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         SilverguardCAM.configure(this, "Bearer 3|14sa2lC4r0jEKLqUpBWcGowIbkt30ziyNJqWvniQ49b50f69")
 
+        SilverguardCAM.setColors(CAMDefaultColors(CustomCAMColors()))
+        SilverguardCAM.setFonts(CAMDefaultFonts(CustomCAMFonts()))
+
         val button = findViewById<Button>(R.id.btn_open_fragment)
         button.setOnClickListener {
-            val request = RequestUrlModel(
+            val request = CAMRequestUrlModel(
                 transaction_id = generateRandomId(),
                 transaction_amount = 150.0,
                 transaction_time = "2025-07-11 11:10:00",
@@ -41,7 +52,7 @@ class MainActivity : AppCompatActivity(), CAMSdkNavigator {
 
         val buttonList = findViewById<Button>(R.id.btn_get_requests_list)
         buttonList.setOnClickListener {
-            val requestList = RequestListUrlModel(
+            val requestList = CAMRequestListUrlModel(
                 reporter_client_id = "12345678901"
             )
             SilverguardCAM.getRequests(this, requestList)
@@ -58,4 +69,32 @@ class MainActivity : AppCompatActivity(), CAMSdkNavigator {
     override fun onBackFromCAMSdk(origin: String?) {
         Toast.makeText(this, "Comando 'back' vindo da $origin", Toast.LENGTH_SHORT).show()
     }
+}
+
+class CustomCAMColors : CAMColorsInterface {
+    override val background = "#F8F8F8".toColorInt()
+    override val primary = "#FF9800".toColorInt()
+    override val label = "#212121".toColorInt()
+    override val buttonTitle = "#FFFFFF".toColorInt()
+    override val buttonEnabled = "#FF9800".toColorInt()
+    override val buttonDisabled = "#BDBDBD".toColorInt()
+}
+
+class CustomCAMFonts : CAMFontsInterface {
+    override val button = CAMFontStyles(
+        size = 14f,
+        style = Typeface.BOLD
+    )
+    override val body = CAMFontStyles(
+        size = 14f,
+        style = Typeface.NORMAL
+    )
+    override val headline2 = CAMFontStyles(
+        size = 24f,
+        style = Typeface.BOLD
+    )
+    override val headline3 = CAMFontStyles(
+        size = 20f,
+        style = Typeface.BOLD
+    )
 }

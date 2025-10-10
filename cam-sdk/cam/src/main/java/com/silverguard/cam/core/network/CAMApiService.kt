@@ -1,8 +1,8 @@
 package com.silverguard.cam.core.network
 
 import com.silverguard.cam.core.config.SilverguardCAM
-import com.silverguard.cam.core.model.RequestListUrlModel
-import com.silverguard.cam.core.model.RequestUrlModel
+import com.silverguard.cam.core.model.CAMRequestListUrlModel
+import com.silverguard.cam.core.model.CAMRequestUrlModel
 import com.silverguard.cam.core.model.ResponseUrlModel
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -15,12 +15,12 @@ import retrofit2.http.POST
 interface ApiService {
     @POST("api/v1/med-requests")
     suspend fun postMedRequest(
-        @Body request: RequestUrlModel
+        @Body request: CAMRequestUrlModel
     ): Response<ResponseUrlModel>
 
     @POST("/api/v1/med-requests/list-url")
     suspend fun listUrl(
-        @Body request: RequestListUrlModel
+        @Body request: CAMRequestListUrlModel
     ): Response<ResponseUrlModel>
 }
 

@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.silverguard.cam.ui.home.HomeFragment"
+        android:name="com.silverguard.cam.ui.home.CamHomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_cam_home" >
         <action
             android:id="@+id/action_homeFragment_to_webViewFragment"
             app:destination="@id/webViewFragment" />
@@ -17,9 +17,9 @@
 
     <fragment
         android:id="@+id/webViewFragment"
-        android:name="com.silverguard.cam.ui.webview.WebViewFragment"
+        android:name="com.silverguard.cam.ui.webview.CamWebViewFragment"
         android:label="fragment_web_view"
-        tools:layout="@layout/fragment_web_view" >
+        tools:layout="@layout/fragment_cam_web_view" >
 
         <argument
             android:name="url"

@@ -1,5 +1,5 @@
 package com.silverguard.cam.core.model
 
-data class RequestListUrlModel(
+data class CAMRequestListUrlModel(
     val reporter_client_id: String
 )

@@ -3,19 +3,19 @@ package com.silverguard.cam.core.config
 import android.content.Context
 import android.content.Intent
 import com.silverguard.cam.CamMainActivity
-import com.silverguard.cam.core.model.RequestListUrlModel
-import com.silverguard.cam.core.model.RequestUrlModel
-import com.silverguard.cam.core.styles.ColorsInterface
-import com.silverguard.cam.core.styles.FontsInterface
+import com.silverguard.cam.core.model.CAMRequestListUrlModel
+import com.silverguard.cam.core.model.CAMRequestUrlModel
+import com.silverguard.cam.core.styles.CAMColorsInterface
+import com.silverguard.cam.core.styles.CAMFontsInterface
 import com.silverguard.cam.core.styles.Stylesheet
-import com.silverguard.cam.init.SilverguardKoinInitializer
+import com.silverguard.cam.init.SilverguardCamKoinInitializer
 
 object SilverguardCAM {
 
     private var apiKey: String? = null
     private var isInitialized = false
-    private var requestUrlModel: RequestUrlModel? = null
-    private var requestListUrlModel: RequestListUrlModel? = null
+    private var CAMRequestUrlModel: CAMRequestUrlModel? = null
+    private var CAMRequestListUrlModel: CAMRequestListUrlModel? = null
     private var flow: FLOW = FLOW.CREATE_REQUEST
 
     fun configure(context: Context, apiKey: String) {
@@ -25,12 +25,12 @@ object SilverguardCAM {
         }
     }
 
-    fun setColors(colors: ColorsInterface) {
-        Stylesheet.setColors(colors)
+    fun setColors(colors: CAMColorsInterface) {
+        Stylesheet.setCAMColors(colors)
     }
 
-    fun setFonts(fonts: FontsInterface) {
-        Stylesheet.setFonts(fonts)
+    fun setFonts(fonts: CAMFontsInterface) {
+        Stylesheet.setCAMFonts(fonts)
     }
 
     fun getFlow() = this.flow
@@ -40,27 +40,27 @@ object SilverguardCAM {
         return apiKey!!
     }
 
-    fun getRequestUrlModel(): RequestUrlModel {
+    fun getRequestUrlModel(): CAMRequestUrlModel {
         check(isInitialized) { "SilverguardCAM is not configured. Call configure(context, apiKey) first." }
-        return requestUrlModel ?: throw IllegalStateException("RequestUrlModel is not set. Call launch(context, model) first.")
+        return CAMRequestUrlModel ?: throw IllegalStateException("RequestUrlModel is not set. Call launch(context, model) first.")
     }
 
-    fun getRequestListUrlModel(): RequestListUrlModel {
+    fun getRequestListUrlModel(): CAMRequestListUrlModel {
         check(isInitialized) { "SilverguardCAM is not configured. Call configure(context, apiKey) first." }
-        return requestListUrlModel ?: throw IllegalStateException("RequestUrlModel is not set. Call launch(context, model) first.")
+        return CAMRequestListUrlModel ?: throw IllegalStateException("RequestUrlModel is not set. Call launch(context, model) first.")
     }
 
-    fun createRequest(context: Context, model: RequestUrlModel) {
-        SilverguardKoinInitializer.init(context)
-        this.requestUrlModel = model
+    fun createRequest(context: Context, model: CAMRequestUrlModel) {
+        SilverguardCamKoinInitializer.init(context)
+        this.CAMRequestUrlModel = model
         this.flow = FLOW.CREATE_REQUEST
         val intent = Intent(context, CamMainActivity::class.java)
         context.startActivity(intent)
     }
 
-    fun getRequests(context: Context, model: RequestListUrlModel) {
-        SilverguardKoinInitializer.init(context)
-        this.requestListUrlModel = model
+    fun getRequests(context: Context, model: CAMRequestListUrlModel) {
+        SilverguardCamKoinInitializer.init(context)
+        this.CAMRequestListUrlModel = model
         this.flow = FLOW.GET_REQUESTS
         val intent = Intent(context, CamMainActivity::class.java)
         context.startActivity(intent)

@@ -20,11 +20,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.silverguard.cam.core.navigator.CAMSdkNavigator
-import com.silverguard.cam.databinding.FragmentWebViewBinding
+import com.silverguard.cam.databinding.FragmentCamWebViewBinding
 
-class WebViewFragment : Fragment() {
+class CamWebViewFragment : Fragment() {
 
-    private var _binding: FragmentWebViewBinding? = null
+    private var _binding: FragmentCamWebViewBinding? = null
     private val binding get() = _binding!!
     private lateinit var bridge: WebAppBridge
     private var navigator: CAMSdkNavigator? = null
@@ -82,7 +82,7 @@ class WebViewFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentWebViewBinding.inflate(inflater, container, false)
+        _binding = FragmentCamWebViewBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -95,7 +95,7 @@ class WebViewFragment : Fragment() {
     private fun initScreen() {
         val url = arguments?.getString("url") ?: "file:///android_asset/bridge.html"
 
-        binding.webView.apply {
+        binding.camWebView.apply {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.allowFileAccess = true
