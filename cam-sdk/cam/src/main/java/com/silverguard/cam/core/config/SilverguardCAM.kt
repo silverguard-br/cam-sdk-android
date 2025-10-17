@@ -20,6 +20,7 @@ object SilverguardCAM {
 
     fun configure(context: Context, apiKey: String) {
         if (!isInitialized) {
+            SilverguardCamKoinInitializer.init(context)
             this.apiKey = apiKey
             this.isInitialized = true
         }
@@ -51,7 +52,6 @@ object SilverguardCAM {
     }
 
     fun createRequest(context: Context, model: CAMRequestUrlModel) {
-        SilverguardCamKoinInitializer.init(context)
         this.CAMRequestUrlModel = model
         this.flow = FLOW.CREATE_REQUEST
         val intent = Intent(context, CamMainActivity::class.java)
@@ -59,7 +59,6 @@ object SilverguardCAM {
     }
 
     fun getRequests(context: Context, model: CAMRequestListUrlModel) {
-        SilverguardCamKoinInitializer.init(context)
         this.CAMRequestListUrlModel = model
         this.flow = FLOW.GET_REQUESTS
         val intent = Intent(context, CamMainActivity::class.java)

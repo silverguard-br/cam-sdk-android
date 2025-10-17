@@ -16,6 +16,7 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebViewClient
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -89,6 +90,20 @@ class CamWebViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initScreen()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            if (isAdded && _binding != null) {
+                if (binding.camWebView.canGoBack()) {
+                    binding.camWebView.goBack()
+                } else {
+                    navigator?.onBackFromCAMSdk("hardware")
+                    requireActivity().finish()
+                }
+            }
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")

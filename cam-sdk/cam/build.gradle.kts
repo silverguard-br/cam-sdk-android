@@ -69,7 +69,7 @@ publishing {
         create<MavenPublication>("release") {
             groupId = "com.github.silverguard-br"
             artifactId = "cam"
-            version = "1.0.0"
+            version = "1.1.3"
 
             afterEvaluate {
                 from(components["release"])

@@ -22,6 +22,8 @@ class MainActivity : AppCompatActivity(), CAMSdkNavigator {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //SampleKoinInitializer.init(this)
+
         SilverguardCAM.configure(this, "Bearer 3|14sa2lC4r0jEKLqUpBWcGowIbkt30ziyNJqWvniQ49b50f69")
 
         SilverguardCAM.setColors(CAMDefaultColors(CustomCAMColors()))
@@ -32,7 +34,7 @@ class MainActivity : AppCompatActivity(), CAMSdkNavigator {
             val request = CAMRequestUrlModel(
                 transaction_id = generateRandomId(),
                 transaction_amount = 150.0,
-                transaction_time = "2025-07-11 11:10:00",
+                transaction_time = "2025-10-11 11:10:00",
                 transaction_description = "Pagamento via PIX",
                 reporter_client_name = "John Doe",
                 reporter_client_id = 123456789L,
