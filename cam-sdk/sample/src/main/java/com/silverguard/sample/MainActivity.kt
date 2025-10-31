@@ -6,32 +6,32 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
-import com.silverguard.cam.core.config.SilverguardCAM
-import com.silverguard.cam.core.model.CAMRequestListUrlModel
-import com.silverguard.cam.core.model.CAMRequestUrlModel
-import com.silverguard.cam.core.navigator.CAMSdkNavigator
-import com.silverguard.cam.core.styles.CAMDefaultColors
-import com.silverguard.cam.core.styles.CAMColorsInterface
-import com.silverguard.cam.core.styles.CAMDefaultFonts
-import com.silverguard.cam.core.styles.CAMFontStyles
-import com.silverguard.cam.core.styles.CAMFontsInterface
+import com.silverguard.cam.core.config.SilverguardCam
+import com.silverguard.cam.core.model.CamRequestListUrlModel
+import com.silverguard.cam.core.model.CamRequestUrlModel
+import com.silverguard.cam.core.navigator.CamSdkNavigator
+import com.silverguard.cam.core.styles.CamDefaultColors
+import com.silverguard.cam.core.styles.CamColorsInterface
+import com.silverguard.cam.core.styles.CamDefaultFonts
+import com.silverguard.cam.core.styles.CamFontStyles
+import com.silverguard.cam.core.styles.CamFontsInterface
 
-class MainActivity : AppCompatActivity(), CAMSdkNavigator {
+class MainActivity : AppCompatActivity(), CamSdkNavigator {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //SampleKoinInitializer.init(this)
+        SampleKoinInitializer.init(this)
 
-        SilverguardCAM.configure(this, "Bearer 3|14sa2lC4r0jEKLqUpBWcGowIbkt30ziyNJqWvniQ49b50f69")
+        SilverguardCam.configure(this, "3|14sa2lC4r0jEKLqUpBWcGowIbkt30ziyNJqWvniQ49b50f69")
 
-        SilverguardCAM.setColors(CAMDefaultColors(CustomCAMColors()))
-        SilverguardCAM.setFonts(CAMDefaultFonts(CustomCAMFonts()))
+        SilverguardCam.setColors(CamDefaultColors(CustomCamColors()))
+        SilverguardCam.setFonts(CamDefaultFonts(CustomCamFonts()))
 
         val button = findViewById<Button>(R.id.btn_open_fragment)
         button.setOnClickListener {
-            val request = CAMRequestUrlModel(
+            val request = CamRequestUrlModel(
                 transaction_id = generateRandomId(),
                 transaction_amount = 150.0,
                 transaction_time = "2025-10-11 11:10:00",
@@ -49,15 +49,15 @@ class MainActivity : AppCompatActivity(), CAMSdkNavigator {
                 client_birth = "1985-03-22",
                 autofraud_risk = true
             )
-            SilverguardCAM.createRequest(this, request)
+            SilverguardCam.createRequest(this, request)
         }
 
         val buttonList = findViewById<Button>(R.id.btn_get_requests_list)
         buttonList.setOnClickListener {
-            val requestList = CAMRequestListUrlModel(
+            val requestList = CamRequestListUrlModel(
                 reporter_client_id = "12345678901"
             )
-            SilverguardCAM.getRequests(this, requestList)
+            SilverguardCam.getRequests(this, requestList)
         }
     }
 
@@ -68,12 +68,12 @@ class MainActivity : AppCompatActivity(), CAMSdkNavigator {
             .joinToString("")
     }
 
-    override fun onBackFromCAMSdk(origin: String?) {
+    override fun onBackFromCamSdk(origin: String?) {
         Toast.makeText(this, "Comando 'back' vindo da $origin", Toast.LENGTH_SHORT).show()
     }
 }
 
-class CustomCAMColors : CAMColorsInterface {
+class CustomCamColors : CamColorsInterface {
     override val background = "#F8F8F8".toColorInt()
     override val primary = "#FF9800".toColorInt()
     override val label = "#212121".toColorInt()
@@ -82,20 +82,20 @@ class CustomCAMColors : CAMColorsInterface {
     override val buttonDisabled = "#BDBDBD".toColorInt()
 }
 
-class CustomCAMFonts : CAMFontsInterface {
-    override val button = CAMFontStyles(
+class CustomCamFonts : CamFontsInterface {
+    override val button = CamFontStyles(
         size = 14f,
         style = Typeface.BOLD
     )
-    override val body = CAMFontStyles(
+    override val body = CamFontStyles(
         size = 14f,
         style = Typeface.NORMAL
     )
-    override val headline2 = CAMFontStyles(
+    override val headline2 = CamFontStyles(
         size = 24f,
         style = Typeface.BOLD
     )
-    override val headline3 = CAMFontStyles(
+    override val headline3 = CamFontStyles(
         size = 20f,
         style = Typeface.BOLD
     )

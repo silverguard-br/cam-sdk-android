@@ -20,7 +20,7 @@ import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.silverguard.cam.core.navigator.CAMSdkNavigator
+import com.silverguard.cam.core.navigator.CamSdkNavigator
 import com.silverguard.cam.databinding.FragmentCamWebViewBinding
 
 class CamWebViewFragment : Fragment() {
@@ -28,13 +28,13 @@ class CamWebViewFragment : Fragment() {
     private var _binding: FragmentCamWebViewBinding? = null
     private val binding get() = _binding!!
     private lateinit var bridge: WebAppBridge
-    private var navigator: CAMSdkNavigator? = null
+    private var navigator: CamSdkNavigator? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         navigator = when {
-            parentFragment is CAMSdkNavigator -> parentFragment as CAMSdkNavigator
-            context is CAMSdkNavigator -> context as CAMSdkNavigator
+            parentFragment is CamSdkNavigator -> parentFragment as CamSdkNavigator
+            context is CamSdkNavigator -> context as CamSdkNavigator
             else -> null
         }
     }
@@ -99,7 +99,7 @@ class CamWebViewFragment : Fragment() {
                 if (binding.camWebView.canGoBack()) {
                     binding.camWebView.goBack()
                 } else {
-                    navigator?.onBackFromCAMSdk("hardware")
+                    navigator?.onBackFromCamSdk("hardware")
                     requireActivity().finish()
                 }
             }
@@ -181,7 +181,7 @@ class CamWebViewFragment : Fragment() {
                 },
                 onBackCommand = { origin ->
                     requireActivity().runOnUiThread {
-                        navigator?.onBackFromCAMSdk(origin)
+                        navigator?.onBackFromCamSdk(origin)
                         requireActivity().finish()
                     }
                 }

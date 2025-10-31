@@ -1,6 +1,6 @@
 package com.silverguard.cam.core.styles
 
-interface CAMColorsInterface {
+interface CamColorsInterface {
     val background: Int
     val primary: Int
     val label: Int

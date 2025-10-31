@@ -3,7 +3,7 @@ package com.silverguard.cam.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.silverguard.cam.core.config.FLOW
-import com.silverguard.cam.core.config.SilverguardCAM
+import com.silverguard.cam.core.config.SilverguardCam
 import com.silverguard.cam.core.network.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,15 +18,15 @@ class HomeViewModel : ViewModel() {
     fun onAction(action: HomeUiAction) {
         when (action) {
             is HomeUiAction.Load, HomeUiAction.Retry -> {
-                if (SilverguardCAM.getFlow() == FLOW.CREATE_REQUEST) loadData()
-                else if (SilverguardCAM.getFlow() == FLOW.GET_REQUESTS) loadListUrlData()
+                if (SilverguardCam.getFlow() == FLOW.CREATE_REQUEST) loadData()
+                else if (SilverguardCam.getFlow() == FLOW.GET_REQUESTS) loadListUrlData()
             }
         }
     }
 
     private fun loadData() {
         viewModelScope.launch {
-            val response = RetrofitClient.api.postMedRequest(SilverguardCAM.getRequestUrlModel())
+            val response = RetrofitClient.api.postMedRequest(SilverguardCam.getRequestUrlModel())
             if (response.isSuccessful) {
                 val url = response.body()?.data?.url
                 if (!url.isNullOrEmpty())
@@ -41,7 +41,7 @@ class HomeViewModel : ViewModel() {
 
     private fun loadListUrlData() {
         viewModelScope.launch {
-            val response = RetrofitClient.api.listUrl(SilverguardCAM.getRequestListUrlModel())
+            val response = RetrofitClient.api.listUrl(SilverguardCam.getRequestListUrlModel())
             if (response.isSuccessful) {
                 val url = response.body()?.data?.url
                 if (!url.isNullOrEmpty())

@@ -2,9 +2,9 @@ package com.silverguard.cam.core.styles
 
 import androidx.core.graphics.toColorInt
 
-class CAMDefaultColors(
-    private val customColors: CAMColorsInterface? = null
-) : CAMColorsInterface {
+class CamDefaultColors(
+    private val customColors: CamColorsInterface? = null
+) : CamColorsInterface {
     override val background: Int =
         customColors?.background ?: "#FFFFFF".toColorInt()
 

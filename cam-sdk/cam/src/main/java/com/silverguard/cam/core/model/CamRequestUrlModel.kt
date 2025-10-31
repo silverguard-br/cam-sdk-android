@@ -1,6 +1,6 @@
 package com.silverguard.cam.core.model
 
-data class CAMRequestUrlModel(
+data class CamRequestUrlModel(
     val transaction_id: String,
     val transaction_amount: Double? = null,
     val transaction_time: String? = null,

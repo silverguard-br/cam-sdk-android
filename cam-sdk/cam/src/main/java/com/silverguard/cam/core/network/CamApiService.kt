@@ -1,8 +1,8 @@
 package com.silverguard.cam.core.network
 
-import com.silverguard.cam.core.config.SilverguardCAM
-import com.silverguard.cam.core.model.CAMRequestListUrlModel
-import com.silverguard.cam.core.model.CAMRequestUrlModel
+import com.silverguard.cam.core.config.SilverguardCam
+import com.silverguard.cam.core.model.CamRequestListUrlModel
+import com.silverguard.cam.core.model.CamRequestUrlModel
 import com.silverguard.cam.core.model.ResponseUrlModel
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -15,12 +15,12 @@ import retrofit2.http.POST
 interface ApiService {
     @POST("api/v1/med-requests")
     suspend fun postMedRequest(
-        @Body request: CAMRequestUrlModel
+        @Body request: CamRequestUrlModel
     ): Response<ResponseUrlModel>
 
     @POST("/api/v1/med-requests/list-url")
     suspend fun listUrl(
-        @Body request: CAMRequestListUrlModel
+        @Body request: CamRequestListUrlModel
     ): Response<ResponseUrlModel>
 }
 
@@ -31,7 +31,7 @@ object RetrofitClient {
     private val authInterceptor = Interceptor { chain ->
         val original = chain.request()
         val requestBuilder = original.newBuilder()
-            .addHeader("Authorization", SilverguardCAM.getApiKey())
+            .addHeader("Authorization", "Bearer ${SilverguardCam.getApiKey()}")
             .addHeader("Content-Type", "application/json")
             .addHeader("Accept", "application/json")
             .addHeader("Cache-Control", "no-cache")
@@ -41,15 +41,15 @@ object RetrofitClient {
     }
 
     private val httpClient = OkHttpClient.Builder()
-        .addInterceptor(com.silverguard.cam.core.network.RetrofitClient.authInterceptor)
+        .addInterceptor(authInterceptor)
         .build()
 
-    val api: com.silverguard.cam.core.network.ApiService by lazy {
+    val api: ApiService by lazy {
         Retrofit.Builder()
-            .baseUrl(com.silverguard.cam.core.network.RetrofitClient.BASE_URL)
-            .client(com.silverguard.cam.core.network.RetrofitClient.httpClient)
+            .baseUrl(BASE_URL)
+            .client(httpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(com.silverguard.cam.core.network.ApiService::class.java)
+            .create(ApiService::class.java)
     }
 }
