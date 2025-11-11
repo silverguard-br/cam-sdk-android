@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity(), CamSdkNavigator {
                 transaction_time = "2025-10-11 11:10:00",
                 transaction_description = "Pagamento via PIX",
                 reporter_client_name = "John Doe",
-                reporter_client_id = 123456789L,
+                reporter_client_id = "123456789",
                 contested_participant_id = "123456",
                 counterparty_client_name = "Maria dos Santos",
                 counterparty_client_id = 987654321L,
@@ -47,7 +47,9 @@ class MainActivity : AppCompatActivity(), CamSdkNavigator {
                 client_id = "CLI_456789",
                 client_since = "2020-01-15",
                 client_birth = "1985-03-22",
-                autofraud_risk = true
+                autofraud_risk = true,
+                reporter_branch_number = 1234,
+                reporter_account_number = 567890
             )
             SilverguardCam.createRequest(this, request)
         }
@@ -55,7 +57,9 @@ class MainActivity : AppCompatActivity(), CamSdkNavigator {
         val buttonList = findViewById<Button>(R.id.btn_get_requests_list)
         buttonList.setOnClickListener {
             val requestList = CamRequestListUrlModel(
-                reporter_client_id = "12345678901"
+                reporter_client_id = "12345678901",
+                reporter_branch_number = 1234,
+                reporter_account_number = 567890
             )
             SilverguardCam.getRequests(this, requestList)
         }

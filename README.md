@@ -213,7 +213,9 @@ val request = RequestUrlModel(
     client_id = "CLI_456789",
     client_since = "2020-01-15",
     client_birth = "1985-03-22",
-    autofraud_risk = true
+    autofraud_risk = true,
+    reporter_branch_number = 1234, // Opcional
+    reporter_account_number = 567890 // Opcional
 )
 
 SilverguardCAM.createRequest(this, request) // 'this' = Activity/Context
@@ -224,7 +226,9 @@ b) Visualizar lista de contestações
 import com.silverguard.cam.core.model.RequestListUrlModel
 
 val listModel = RequestListUrlModel(
-    reporter_client_id = "12345678901"
+    reporter_client_id = "12345678901",
+    reporter_branch_number = 1234, // Opcional
+    reporter_account_number = 567890 // Opcional
 )
 
 SilverguardCAM.getRequests(this, listModel)
@@ -250,14 +254,18 @@ RequestUrlModel(
     client_id = "CLI_456789",
     client_since = "2020-01-15",
     client_birth = "1985-03-22",
-    autofraud_risk = true
+    autofraud_risk = true,
+    reporter_branch_number = 1234, // Opcional
+    reporter_account_number = 567890 // Opcional
 )
 ```
 
 RequestListUrlModel (utilizado na listagem de contestações)
 ```kotlin
 RequestListUrlModel(
-    reporter_client_id = "12345678901"
+    reporter_client_id = "12345678901",
+    reporter_branch_number = 1234, // Opcional
+    reporter_account_number = 567890 // Opcional
 )
 ```
 ### 4) Captura de retorno com CAMSdkNavigator
@@ -316,7 +324,9 @@ class MainActivity : AppCompatActivity(), CAMSdkNavigator {
                 client_id = "CLI_456789",
                 client_since = "2020-01-15",
                 client_birth = "1985-03-22",
-                autofraud_risk = true
+                autofraud_risk = true,
+                reporter_branch_number = 1234, // Opcional
+                reporter_account_number = 567890 // Opcional
             )
             SilverguardCAM.createRequest(this, request)
         }
@@ -324,7 +334,9 @@ class MainActivity : AppCompatActivity(), CAMSdkNavigator {
         // Listar contestações
         findViewById<Button>(R.id.btn_get_requests_list).setOnClickListener {
             val requestList = RequestListUrlModel(
-                reporter_client_id = "12345678901"
+                reporter_client_id = "12345678901",
+                reporter_branch_number = 1234, // Opcional
+                reporter_account_number = 567890 // Opcional
             )
             SilverguardCAM.getRequests(this, requestList)
         }
@@ -335,6 +347,46 @@ class MainActivity : AppCompatActivity(), CAMSdkNavigator {
     }
 }
 ```
+
+### 6) Configuração de Estilo (Opcional)
+
+```kotlin
+
+// Definição das cores a serem utilizadas
+class CustomCamColors : CamColorsInterface {
+    override val background = "#F8F8F8".toColorInt()
+    override val primary = "#FF9800".toColorInt()
+    override val label = "#212121".toColorInt()
+    override val buttonTitle = "#FFFFFF".toColorInt()
+    override val buttonEnabled = "#FF9800".toColorInt()
+    override val buttonDisabled = "#BDBDBD".toColorInt()
+}
+// Aplicação das cores definidas
+SilverguardCam.setColors(CamDefaultColors(CustomCamColors()))
+
+// Definição dos estilos de texto a serem utilizadas
+class CustomCamFonts : CamFontsInterface {
+    override val button = CamFontStyles(
+        size = 14f,
+        style = Typeface.BOLD
+    )
+    override val body = CamFontStyles(
+        size = 14f,
+        style = Typeface.NORMAL
+    )
+    override val headline2 = CamFontStyles(
+        size = 24f,
+        style = Typeface.BOLD
+    )
+    override val headline3 = CamFontStyles(
+        size = 20f,
+        style = Typeface.BOLD
+    )
+}
+// Aplicação dos estilos definidos
+SilverguardCam.setFonts(CamDefaultFonts(CustomCamFonts()))
+```
+> A configuração deve ser feita antes de iniciar qualquer fluxo.
 
 ## 📄 Licença
 Este SDK é distribuído sob a licença proprietária da Silverguard. O uso é restrito a clientes autorizados.

@@ -6,7 +6,7 @@ data class CamRequestUrlModel(
     val transaction_time: String? = null,
     val transaction_description: String? = null,
     val reporter_client_name: String? = null,
-    val reporter_client_id: Long? = null,
+    val reporter_client_id: String? = null,
     val contested_participant_id: String? = null,
     val counterparty_client_name: String? = null,
     val counterparty_client_id: Long? = null,
@@ -17,4 +17,6 @@ data class CamRequestUrlModel(
     val client_since: String? = null,
     val client_birth: String? = null,
     val autofraud_risk: Boolean? = null,
+    val reporter_branch_number: Int? = null,
+    val reporter_account_number: Int? = null
 )
