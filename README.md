@@ -203,7 +203,7 @@ val request = RequestUrlModel(
     transaction_time = "2025-07-10 11:10:00", // yyyy-MM-dd HH:mm:ss
     transaction_description = "Pagamento via PIX",
     reporter_client_name = "Fulano de Tal",
-    reporter_client_id = 12345678901L,
+    reporter_client_id = "12345678901",
     contested_participant_id = "123456",
     counterparty_client_name = "John Doe",
     counterparty_client_id = 98765432100L,
@@ -244,7 +244,7 @@ RequestUrlModel(
     transaction_time = "2025-07-11 11:10:00",
     transaction_description = "Pagamento via PIX",
     reporter_client_name = "John Doe",
-    reporter_client_id = 123456789L,
+    reporter_client_id = "123456789",
     contested_participant_id = "123456",
     counterparty_client_name = "Maria dos Santos",
     counterparty_client_id = 987654321L,
@@ -314,7 +314,7 @@ class MainActivity : AppCompatActivity(), CAMSdkNavigator {
                 transaction_time = "2025-07-11 11:10:00",
                 transaction_description = "Pagamento via PIX",
                 reporter_client_name = "John Doe",
-                reporter_client_id = 123456789L,
+                reporter_client_id = "123456789",
                 contested_participant_id = "123456",
                 counterparty_client_name = "Maria dos Santos",
                 counterparty_client_id = 987654321L,
@@ -351,7 +351,6 @@ class MainActivity : AppCompatActivity(), CAMSdkNavigator {
 ### 6) Configuração de Estilo (Opcional)
 
 ```kotlin
-
 // Definição das cores a serem utilizadas
 class CustomCamColors : CamColorsInterface {
     override val background = "#F8F8F8".toColorInt()
