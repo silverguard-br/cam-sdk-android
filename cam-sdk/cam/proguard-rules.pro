@@ -47,5 +47,13 @@
 -keep public class com.silverguard.cam.core.config.SilverguardCam { public *; }
 -keep public class com.silverguard.cam.CamMainActivity { public *; }
 
+# Mantém Activities e Fragments do SDK (usados via reflexão / Navigation)
+-keep class com.silverguard.cam.**Activity { *; }
+-keep class com.silverguard.cam.**Fragment { *; }
+-keep class com.silverguard.cam.ui.** { *; }
+
+# Também garante que qualquer Fragment do projeto não seja removido
+-keep class * extends androidx.fragment.app.Fragment { *; }
+
 # Ignora warnings de classes Java 9+
 -dontwarn java.lang.invoke.**
