@@ -47,6 +47,25 @@
 -keep public class com.silverguard.cam.core.config.SilverguardCam { public *; }
 -keep public class com.silverguard.cam.CamMainActivity { public *; }
 
+# Mantém interfaces de estilo públicas do SDK
+-keep interface com.silverguard.cam.core.styles.** { *; }
+
+# Garante que enums públicos do SDK não sejam ofuscados ou removidos
+-keep enum com.silverguard.cam.core.config.ENVIRONMENT { *; }
+-keep enum com.silverguard.cam.core.config.FLOW { *; }
+
+# Garante que os métodos e campos públicos do objeto Kotlin SilverguardCam sejam preservados
+-keep class com.silverguard.cam.core.config.SilverguardCam { public *; }
+-keepclassmembers class com.silverguard.cam.core.config.SilverguardCam {
+    public static *;
+}
+
+# Mantém possíveis constantes públicas e getters gerados (ex.: getBaseUrl)
+-keepclassmembers class com.silverguard.cam.core.config.SilverguardCam {
+    public <methods>;
+    public <fields>;
+}
+
 # Mantém Activities e Fragments do SDK (usados via reflexão / Navigation)
 -keep class com.silverguard.cam.**Activity { *; }
 -keep class com.silverguard.cam.**Fragment { *; }

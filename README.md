@@ -131,7 +131,8 @@ fun postMessage(message: String) {
     when (command) {
         "requestMicrophonePermission" -> requestAudioPermissions()
         "requestLibraryPermission" -> requestLibraryPermission()
-        "back" -> onBackCommand(json.optString("origin", ""))
+        "navigateToTransactionsList", "back" -> onBackCommand(json.optString("origin", ""))
+        "openSettings" -> openSettings()
         else -> Toast.makeText(context, "Comando desconhecido: $command", Toast.LENGTH_SHORT).show()
     }
 }
@@ -154,7 +155,7 @@ Registro da ponte na WebView — WebViewFragment
 
 Pontos-chave:
 - Permissão de microfone:
-    * Verifica RECORD_AUDIO e MODIFY_AUDIO_SETTINGS
+    * Verifica RECORD_AUDIO
     * Se concedidas → request.grant(...)
     * Se não → dispara requestAudioPermissions.launch(...)
     * Após decisão → envia microphonePermission para a Web com status
@@ -181,8 +182,17 @@ import com.silverguard.cam.core.config.SilverguardCAM
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        SilverguardCAM.configure(this, "SUA_API_KEY_AQUI")
+        SilverguardCAM.configure(
+            context = this, 
+            apiKey = "SUA_API_KEY_AQUI",
+            environment = [ALGUM_ENVIRONMENT].name)
     }
+}
+
+enum class ENVIRONMENT {
+    DEBUG,
+    STAGING,
+    PRODUCTION
 }
 ```
 > A configuração deve ser feita antes de iniciar qualquer fluxo.

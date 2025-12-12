@@ -17,12 +17,15 @@ object SilverguardCam {
     private var CamRequestUrlModel: CamRequestUrlModel? = null
     private var CamRequestListUrlModel: CamRequestListUrlModel? = null
     private var flow: FLOW = FLOW.CREATE_REQUEST
+    private var env: String = ENVIRONMENT.DEBUG.name
+    private var baseUrl: String = ""
 
-    fun configure(context: Context, apiKey: String) {
+    fun configure(context: Context, apiKey: String, environment: String) {
         if (!isInitialized) {
             SilverguardCamKoinInitializer.init(context)
             this.apiKey = apiKey
             this.isInitialized = true
+            setEnvironment(env = environment)
         }
     }
 
@@ -34,7 +37,7 @@ object SilverguardCam {
         Stylesheet.setCamFonts(fonts)
     }
 
-    fun getFlow() = this.flow
+    fun getFlow(): FLOW = this.flow
 
     fun getApiKey(): String {
         check(isInitialized) { "SilverguardCAM is not configured. Call configure(context, apiKey) first." }
@@ -64,9 +67,30 @@ object SilverguardCam {
         val intent = Intent(context, CamMainActivity::class.java)
         context.startActivity(intent)
     }
+
+    fun setEnvironment(env: String) {
+        this.env = env.uppercase()
+        this.baseUrl = when (this.env) {
+            ENVIRONMENT.DEBUG.name -> "https://test.camapi.sosgolpe.com.br/"
+            ENVIRONMENT.STAGING.name -> "https://test.camapi.sosgolpe.com.br/"
+            ENVIRONMENT.PRODUCTION.name -> "https://api.cam.silverguard.com.br/"
+            else -> ""
+        }
+    }
+
+    fun getBaseUrl(): String {
+        check(isInitialized) { "SilverguardCAM is not configured. Call configure(context, apiKey) first." }
+        return baseUrl
+    }
 }
 
 enum class FLOW {
     CREATE_REQUEST,
     GET_REQUESTS
+}
+
+enum class ENVIRONMENT {
+    DEBUG,
+    STAGING,
+    PRODUCTION
 }

@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
+import com.silverguard.cam.core.config.ENVIRONMENT
 import com.silverguard.cam.core.config.SilverguardCam
 import com.silverguard.cam.core.model.CamRequestListUrlModel
 import com.silverguard.cam.core.model.CamRequestUrlModel
@@ -24,7 +25,11 @@ class MainActivity : AppCompatActivity(), CamSdkNavigator {
 
         SampleKoinInitializer.init(this)
 
-        SilverguardCam.configure(this, "3|14sa2lC4r0jEKLqUpBWcGowIbkt30ziyNJqWvniQ49b50f69")
+        SilverguardCam.configure(
+            context = this,
+            apiKey = "3|14sa2lC4r0jEKLqUpBWcGowIbkt30ziyNJqWvniQ49b50f69",
+            environment = ENVIRONMENT.STAGING.name
+        )
 
         SilverguardCam.setColors(CamDefaultColors(CustomCamColors()))
         SilverguardCam.setFonts(CamDefaultFonts(CustomCamFonts()))
@@ -32,12 +37,12 @@ class MainActivity : AppCompatActivity(), CamSdkNavigator {
         val button = findViewById<Button>(R.id.btn_open_fragment)
         button.setOnClickListener {
             val request = CamRequestUrlModel(
-                transaction_id = generateRandomId(),
-                transaction_amount = 150.0,
-                transaction_time = "2025-10-11 11:10:00",
+                transaction_id = generateRandomId(length = 21),
+                transaction_amount = 170.0,
+                transaction_time = "2025-11-10 11:10:00",
                 transaction_description = "Pagamento via PIX",
                 reporter_client_name = "John Doe",
-                reporter_client_id = "123456789",
+                reporter_client_id = "123456798",
                 contested_participant_id = "123456",
                 counterparty_client_name = "Maria dos Santos",
                 counterparty_client_id = 987654321L,

@@ -43,16 +43,14 @@ class CamWebViewFragment : Fragment() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val micGranted = permissions[Manifest.permission.RECORD_AUDIO] == true
-        val modifyGranted = permissions[Manifest.permission.MODIFY_AUDIO_SETTINGS] == true
 
         val micDeniedPermanently = !micGranted && !shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)
-        val modifyDeniedPermanently = !modifyGranted && !shouldShowRequestPermissionRationale(Manifest.permission.MODIFY_AUDIO_SETTINGS)
 
-        if (micDeniedPermanently || modifyDeniedPermanently) {
+        if (micDeniedPermanently) {
             openAppSettings()
         }
 
-        val granted = micGranted && modifyGranted
+        val granted = micGranted
         bridge.sendActionToWeb("microphonePermission", mapOf("status" to if (granted) "authorized" else "denied"))
     }
 
@@ -128,17 +126,13 @@ class CamWebViewFragment : Fragment() {
                         val micGranted = ContextCompat.checkSelfPermission(
                             requireContext(), Manifest.permission.RECORD_AUDIO
                         ) == PackageManager.PERMISSION_GRANTED
-                        val modifyGranted = ContextCompat.checkSelfPermission(
-                            requireContext(), Manifest.permission.MODIFY_AUDIO_SETTINGS
-                        ) == PackageManager.PERMISSION_GRANTED
 
-                        if (micGranted && modifyGranted) {
+                        if (micGranted) {
                             request.grant(request.resources)
                         } else {
                             requestAudioPermissions.launch(
                                 arrayOf(
-                                    Manifest.permission.RECORD_AUDIO,
-                                    Manifest.permission.MODIFY_AUDIO_SETTINGS
+                                    Manifest.permission.RECORD_AUDIO
                                 )
                             )
                         }
@@ -184,6 +178,9 @@ class CamWebViewFragment : Fragment() {
                         navigator?.onBackFromCamSdk(origin)
                         requireActivity().finish()
                     }
+                },
+                openSettings = {
+                    openAppSettings()
                 }
             )
 
