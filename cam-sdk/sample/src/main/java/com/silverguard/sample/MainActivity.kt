@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity(), CamSdkNavigator {
         SilverguardCam.configure(
             context = this,
             apiKey = "3|14sa2lC4r0jEKLqUpBWcGowIbkt30ziyNJqWvniQ49b50f69",
-            environment = ENVIRONMENT.STAGING.name
+            environment = ENVIRONMENT.DEBUG.name
         )
 
         SilverguardCam.setColors(CamDefaultColors(CustomCamColors()))
@@ -37,15 +37,15 @@ class MainActivity : AppCompatActivity(), CamSdkNavigator {
         val button = findViewById<Button>(R.id.btn_open_fragment)
         button.setOnClickListener {
             val request = CamRequestUrlModel(
-                transaction_id = generateRandomId(length = 21),
+                transaction_id = generateRandomId(),
                 transaction_amount = 170.0,
-                transaction_time = "2025-11-10 11:10:00",
+                transaction_time = "2026-02-10 11:10:00",
                 transaction_description = "Pagamento via PIX",
                 reporter_client_name = "John Doe",
                 reporter_client_id = "123456798",
                 contested_participant_id = "123456",
                 counterparty_client_name = "Maria dos Santos",
-                counterparty_client_id = 987654321L,
+                counterparty_client_id = "987654321",
                 counterparty_client_key = "DEST_KEY_1",
                 protocol_id = "PROT_2025_001",
                 pix_auto = true,
@@ -70,9 +70,9 @@ class MainActivity : AppCompatActivity(), CamSdkNavigator {
         }
     }
 
-    private fun generateRandomId(length: Int = 10): String {
+    private fun generateRandomId(): String {
         val allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-        return (1..length)
+        return (1..21)
             .map { allowedChars.random() }
             .joinToString("")
     }
@@ -82,13 +82,16 @@ class MainActivity : AppCompatActivity(), CamSdkNavigator {
     }
 }
 
-class CustomCamColors : CamColorsInterface {
+class CustomCamColors: CamColorsInterface {
     override val background = "#F8F8F8".toColorInt()
-    override val primary = "#FF9800".toColorInt()
-    override val label = "#212121".toColorInt()
+    override val primary = "#00688B".toColorInt()
+    override val label = "#4F94CD".toColorInt()
     override val buttonTitle = "#FFFFFF".toColorInt()
-    override val buttonEnabled = "#FF9800".toColorInt()
-    override val buttonDisabled = "#BDBDBD".toColorInt()
+    override val buttonEnabled = "#00688B".toColorInt()
+    override val buttonDisabled = "#9FB6CD".toColorInt()
+    override val errorIcon = "#EE0000".toColorInt()
+    override val errorTitle = "#CD0000".toColorInt()
+    override val errorSubtitle = "#FF3030".toColorInt()
 }
 
 class CustomCamFonts : CamFontsInterface {

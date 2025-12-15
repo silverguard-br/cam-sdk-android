@@ -14,15 +14,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("proguard-rules.pro")
-        proguardFiles(
-            getDefaultProguardFile("proguard-android-optimize.txt"),
-            "proguard-rules.pro"
-        )
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -75,7 +71,7 @@ publishing {
         create<MavenPublication>("release") {
             groupId = "com.github.silverguard-br"
             artifactId = "cam"
-            version = "1.3.0"
+            version = "1.3.5"
 
             afterEvaluate {
                 from(components["release"])

@@ -3,7 +3,7 @@ package com.silverguard.cam.core.styles
 import androidx.core.graphics.toColorInt
 
 class CamDefaultColors(
-    private val customColors: CamColorsInterface? = null
+    private val customColors: CamColorsInterface? = null,
 ) : CamColorsInterface {
     override val background: Int =
         customColors?.background ?: "#FFFFFF".toColorInt()
@@ -16,8 +16,19 @@ class CamDefaultColors(
 
     override val buttonTitle: Int =
         customColors?.buttonTitle ?: "#FEFEFE".toColorInt()
+
     override val buttonEnabled: Int =
         customColors?.buttonEnabled ?: "#1B264F".toColorInt()
+
     override val buttonDisabled: Int =
         customColors?.buttonDisabled ?: "#767D95".toColorInt()
+
+    override val errorIcon: Int =
+        customColors?.errorIcon ?: primary
+
+    override val errorTitle: Int =
+        customColors?.errorTitle ?: label
+
+    override val errorSubtitle: Int =
+        customColors?.errorSubtitle ?: label
 }

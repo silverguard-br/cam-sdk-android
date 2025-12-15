@@ -3,11 +3,10 @@ package com.silverguard.cam.ui.webview
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context // <-- ADICIONE
+import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +28,7 @@ class CamWebViewFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var bridge: WebAppBridge
     private var navigator: CamSdkNavigator? = null
+    private var pendingPermissionRequest: PermissionRequest? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -42,26 +42,71 @@ class CamWebViewFragment : Fragment() {
     private val requestAudioPermissions = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
+
         val micGranted = permissions[Manifest.permission.RECORD_AUDIO] == true
 
-        val micDeniedPermanently = !micGranted && !shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)
+        when {
+            micGranted -> {
+                pendingPermissionRequest?.grant(
+                    arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+                )
+                bridge.sendActionToWeb(
+                    command = MIC_PERMISSION,
+                    payload = mapOf(PERMISSION_STATUS to AUTHORIZED)
+                )
+            }
 
-        if (micDeniedPermanently) {
-            openAppSettings()
+            shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO) -> {
+                pendingPermissionRequest?.deny()
+                bridge.sendActionToWeb(
+                    command = MIC_PERMISSION,
+                    payload = mapOf(PERMISSION_STATUS to DENIED)
+                )
+            }
+
+            else -> {
+                pendingPermissionRequest?.deny()
+                bridge.sendActionToWeb(
+                    command = MIC_PERMISSION,
+                    payload = mapOf(PERMISSION_STATUS to DENIED_PERMANENTLY)
+                )
+            }
         }
 
-        val granted = micGranted
-        bridge.sendActionToWeb("microphonePermission", mapOf("status" to if (granted) "authorized" else "denied"))
+        pendingPermissionRequest = null
     }
 
     private val requestLibraryPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if (!isGranted && !shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            openAppSettings()
-        }
 
-        bridge.sendActionToWeb("libraryPermission", mapOf("status" to if (isGranted) "authorized" else "denied"))
+        when {
+            //Permissão concedida
+            isGranted -> {
+                bridge.sendActionToWeb(
+                    command = LIBRARY_PERMISSION,
+                    payload = mapOf(PERMISSION_STATUS to AUTHORIZED)
+                )
+            }
+
+            //Usuário negou, mas ainda podemos pedir novamente
+            shouldShowRequestPermissionRationale(
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) -> {
+                bridge.sendActionToWeb(
+                    command = LIBRARY_PERMISSION,
+                    payload = mapOf(PERMISSION_STATUS to DENIED)
+                )
+            }
+
+            // Permissão negada permanentemente – usuário marcou "Não perguntar novamente"
+            else -> {
+                bridge.sendActionToWeb(
+                    command = LIBRARY_PERMISSION,
+                    payload = mapOf(PERMISSION_STATUS to DENIED_PERMANENTLY)
+                )
+            }
+        }
     }
 
     private var fileCallback: ValueCallback<Array<Uri>>? = null
@@ -87,21 +132,17 @@ class CamWebViewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initScreen()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
-            if (isAdded && _binding != null) {
-                if (binding.camWebView.canGoBack()) {
-                    binding.camWebView.goBack()
-                } else {
-                    navigator?.onBackFromCamSdk("hardware")
-                    requireActivity().finish()
-                }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner
+        ) {
+            if (binding.camWebView.canGoBack()) {
+                binding.camWebView.goBack()
+            } else {
+                navigator?.onBackFromCamSdk("hardware")
+                requireActivity().finish()
             }
         }
+        initScreen()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -119,25 +160,24 @@ class CamWebViewFragment : Fragment() {
             webViewClient = WebViewClient()
             webChromeClient = object : WebChromeClient() {
                 override fun onPermissionRequest(request: PermissionRequest) {
-                    Log.d("WebView", "Permission requested: ${request.resources.joinToString()}")
+                    val requiresMic =
+                        request.resources.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
 
-                    val requiresMic = request.resources.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
-                    if (requiresMic) {
-                        val micGranted = ContextCompat.checkSelfPermission(
-                            requireContext(), Manifest.permission.RECORD_AUDIO
-                        ) == PackageManager.PERMISSION_GRANTED
-
-                        if (micGranted) {
-                            request.grant(request.resources)
-                        } else {
-                            requestAudioPermissions.launch(
-                                arrayOf(
-                                    Manifest.permission.RECORD_AUDIO
-                                )
-                            )
-                        }
-                    } else {
+                    if (!requiresMic) {
                         request.deny()
+                        return
+                    }
+
+                    val micGranted = ContextCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.RECORD_AUDIO
+                    ) == PackageManager.PERMISSION_GRANTED
+
+                    if (micGranted) {
+                        request.grant(request.resources)
+                    } else {
+                        pendingPermissionRequest = request
+                        requestAudioPermissions.launch(arrayOf(Manifest.permission.RECORD_AUDIO))
                     }
                 }
 
@@ -161,8 +201,7 @@ class CamWebViewFragment : Fragment() {
                 requestAudioPermissions = {
                     requestAudioPermissions.launch(
                         arrayOf(
-                            Manifest.permission.RECORD_AUDIO,
-                            Manifest.permission.MODIFY_AUDIO_SETTINGS
+                            Manifest.permission.RECORD_AUDIO
                         )
                     )
                 },
@@ -170,7 +209,7 @@ class CamWebViewFragment : Fragment() {
                     if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.S_V2) {
                         requestLibraryPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                     } else {
-                        bridge.sendActionToWeb("libraryPermission", mapOf("status" to "authorized"))
+                        bridge.sendActionToWeb(LIBRARY_PERMISSION, mapOf(PERMISSION_STATUS to AUTHORIZED))
                     }
                 },
                 onBackCommand = { origin ->
@@ -184,20 +223,37 @@ class CamWebViewFragment : Fragment() {
                 }
             )
 
-            addJavascriptInterface(bridge, "AndroidBridge")
+            addJavascriptInterface(bridge, BRIDGE)
             loadUrl(url)
         }
     }
 
     override fun onDestroyView() {
+        binding.camWebView.apply {
+            stopLoading()
+            webChromeClient = null
+            webViewClient = WebViewClient()
+            removeAllViews()
+            destroy()
+        }
         super.onDestroyView()
         _binding = null
     }
 
     private fun openAppSettings() {
         val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = android.net.Uri.fromParts("package", requireContext().packageName, null)
+            data = Uri.fromParts("package", requireContext().packageName, null)
         }
         startActivity(intent)
+    }
+
+    companion object PermissionStatus {
+        const val AUTHORIZED = "authorized"
+        const val DENIED = "denied"
+        const val DENIED_PERMANENTLY = "denied_permanently"
+        const val BRIDGE = "AndroidBridge"
+        const val MIC_PERMISSION = "microphonePermission"
+        const val LIBRARY_PERMISSION = "libraryPermission"
+        const val PERMISSION_STATUS = "status"
     }
 }

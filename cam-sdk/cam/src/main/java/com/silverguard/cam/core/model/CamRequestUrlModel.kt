@@ -9,7 +9,7 @@ data class CamRequestUrlModel(
     val reporter_client_id: String? = null,
     val contested_participant_id: String? = null,
     val counterparty_client_name: String? = null,
-    val counterparty_client_id: Long? = null,
+    val counterparty_client_id: String? = null,
     val counterparty_client_key: String? = null,
     val protocol_id: String? = null,
     val pix_auto: Boolean? = null,

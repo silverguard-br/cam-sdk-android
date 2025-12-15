@@ -94,9 +94,9 @@ class CamHomeFragment : Fragment() {
             camHomeToolbarAlert.navigationIcon?.setTint(camColors.primary)
             camHomeToolbarTitle.setTextColor(camColors.primary)
             camHomeImageAlert.imageTintList =
-                ColorStateList.valueOf(camColors.primary)
-            camHomeTvAlertTitle.setTextColor(camColors.label)
-            camHomeTvAlertSubtitle.setTextColor(camColors.label)
+                ColorStateList.valueOf(camColors.errorIcon ?: camColors.primary)
+            camHomeTvAlertTitle.setTextColor(camColors.errorTitle ?: camColors.label)
+            camHomeTvAlertSubtitle.setTextColor(camColors.errorSubtitle ?: camColors.label)
             //Fonts
             camHomeToolbarTitle.textSize = camFonts.button.size
             camHomeToolbarTitle.typeface = Typeface.create(Typeface.DEFAULT, camFonts.button.style)

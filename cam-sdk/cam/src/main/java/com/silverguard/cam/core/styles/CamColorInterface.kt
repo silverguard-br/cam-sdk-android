@@ -7,4 +7,7 @@ interface CamColorsInterface {
     val buttonTitle: Int
     val buttonEnabled: Int
     val buttonDisabled: Int
+    val errorIcon: Int?
+    val errorTitle: Int?
+    val errorSubtitle: Int?
 }

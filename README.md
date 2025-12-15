@@ -369,6 +369,9 @@ class CustomCamColors : CamColorsInterface {
     override val buttonTitle = "#FFFFFF".toColorInt()
     override val buttonEnabled = "#FF9800".toColorInt()
     override val buttonDisabled = "#BDBDBD".toColorInt()
+    override val errorIcon = "#EE0000".toColorInt() // Se utilizado, passar o valor null (Será utilizado o valor da cor primary)
+    override val errorTitle = "#CD0000".toColorInt() // Se utilizado, passar o valor null (Será utilizado o valor da cor label)
+    override val errorSubtitle = "#FF3030".toColorInt() // Se utilizado, passar o valor null (Será utilizado o valor da cor label)
 }
 // Aplicação das cores definidas
 SilverguardCam.setColors(CamDefaultColors(CustomCamColors()))
